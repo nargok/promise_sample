@@ -1,4 +1,4 @@
-// 処理の順版
+// 処理の順番
 // 1. いいねボタンを押す
 // 2. サーバへクリックイベントを送信する
 // 3. サーバからいいねボタンを押した回数を取得する
@@ -9,26 +9,30 @@ class GoodButton {
     this.clickCount = 0;
   }
 
+  // Promiseの基本
+  // 1. 非同期処理はPromiseのnewで指定する
+  // 2. コールバックはthenでつなげる
+  // 3. エラー処理はcatchで。thenとの順番に注意する
   countUpClickCount() {
-    const xhr = new XMLHttpRequest();
-
-    // callback 非同期処理終了後に実行してほしい関数を指定する
-    xhr.onload = () => {
-      const res = xhr.responseText;
+    // resolve関数：非同期処理が成功したときに呼び出す関数
+    const promise = new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      // callback 非同期処理終了後に実行してほしい関数を指定する
+      xhr.onload = () => { resolve(xhr.responseText) };
+      xhr.open('POST', 'https://(URL)', true) // 3番目の引数が非同期処理をonにする
+      xhr.send();
+    });
+    // thenにはresolveで指定した関数が指定される　戻り値の格納先であるresが来ることを期待している
+    return promise.then((res) => {
       this.clickCount = countFromResponse(res);
-      callback();
-    };
-
-    // 非同期処理で実行する
-    xhr.open('POST', 'https://(URL)', true) // 3番目の引数が非同期処理をonにする
-    xhr.send();
+    })
   }
 }
 
 // 回数を表示する処理:　回数をサーバから受け取った後に表示するため非同期処理にする
 const onClickButton = (goodButton) => {
-  goodButton.countUpClickCount(() => {
-    // 回数を表示
+  // thenで後続の処理を実行する → thenをつなげれば非同期処理を順番に指定できる
+  goodButton.countUpClickCount().then(() => {
     console.log(goodButton.clickCount);
   });
 }
