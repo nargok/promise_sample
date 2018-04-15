@@ -26,7 +26,13 @@ class GoodButton {
     // thenにはresolveで指定した関数が指定される　戻り値の格納先であるresが来ることを期待している
     return promise.then((res) => {
       this.clickCount = countFromResponse(res);
-    })
+      return new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.onload = () => { resolve(xhr.responseText) };
+        xhr.open('POST', 'http://(URL)', true);
+        xhr.send();
+      });
+    });
   }
 }
 
