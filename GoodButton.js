@@ -19,6 +19,7 @@ class GoodButton {
       const xhr = new XMLHttpRequest();
       // callback 非同期処理終了後に実行してほしい関数を指定する
       xhr.onload = () => { resolve(xhr.responseText) };
+      xhr.onerror = () => { reject(xhr.statusText) }; // エラー時の処理
       xhr.open('POST', 'https://(URL)', true) // 3番目の引数が非同期処理をonにする
       xhr.send();
     });
@@ -34,5 +35,9 @@ const onClickButton = (goodButton) => {
   // thenで後続の処理を実行する → thenをつなげれば非同期処理を順番に指定できる
   goodButton.countUpClickCount().then(() => {
     console.log(goodButton.clickCount);
+  }).catch((status) => {
+    // エラー処理　エラーになった際は後続の処理を無視してエラー処理を行う
+    // catchの後にもthenは実行されるため、catch処理は一番最後に書く
+    console.log(status);
   });
 }
